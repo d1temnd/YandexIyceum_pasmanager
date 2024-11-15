@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>296</width>
-    <height>202</height>
+    <width>295</width>
+    <height>240</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="lableNicName">
+      <property name="text">
+       <string>NicName:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
     <item>
      <widget class="QLabel" name="labelTgId">
       <property name="text">

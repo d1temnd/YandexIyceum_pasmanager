@@ -12,11 +12,20 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_SubsequentWindow(object):
     def setupUi(self, SubsequentWindow):
         SubsequentWindow.setObjectName("SubsequentWindow")
-        SubsequentWindow.resize(300, 134)
+        SubsequentWindow.resize(305, 191)
         self.centralwidget = QtWidgets.QWidget(parent=SubsequentWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.labelNic = QtWidgets.QLabel(parent=self.centralwidget)
+        self.labelNic.setObjectName("labelNic")
+        self.verticalLayout.addWidget(self.labelNic)
+        self.NicEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
+        self.NicEdit.setObjectName("NicEdit")
+        self.verticalLayout.addWidget(self.NicEdit)
+        self.sendCodeBtn = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.sendCodeBtn.setObjectName("sendCodeBtn")
+        self.verticalLayout.addWidget(self.sendCodeBtn)
         self.labelCode = QtWidgets.QLabel(parent=self.centralwidget)
         self.labelCode.setObjectName("labelCode")
         self.verticalLayout.addWidget(self.labelCode)
@@ -38,6 +47,8 @@ class Ui_SubsequentWindow(object):
     def retranslateUi(self, SubsequentWindow):
         _translate = QtCore.QCoreApplication.translate
         SubsequentWindow.setWindowTitle(_translate("SubsequentWindow", "Enter Code"))
+        self.labelNic.setText(_translate("SubsequentWindow", "NicName:"))
+        self.sendCodeBtn.setText(_translate("SubsequentWindow", "Send cod"))
         self.labelCode.setText(_translate("SubsequentWindow", "Enter the Code:"))
         self.codeEdit.setPlaceholderText(_translate("SubsequentWindow", "Code"))
         self.submitBtn.setText(_translate("SubsequentWindow", "Submit"))
