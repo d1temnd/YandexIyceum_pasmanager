@@ -13,9 +13,7 @@ def gev_auth_cod():
     return cod
 
 
-def sand_code(user_id: int) -> str:
-    login_code = gev_auth_cod()
-
+def sand_code(user_id: int, login_code: str):
     response = requests.post(
         f"https://api.telegram.org/bot{os.getenv('TOKEN')}/sendMessage",
         params={
@@ -25,7 +23,6 @@ def sand_code(user_id: int) -> str:
     )
 
     print(response.status_code)
-    return str(login_code)
-
+    return response.status_code
 
 # print(sand_code(996027511))
