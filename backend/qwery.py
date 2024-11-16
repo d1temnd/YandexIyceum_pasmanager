@@ -32,7 +32,9 @@ def create_table(db_name):
         # Создаем таблицу users
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY AUTOINCREMENT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                user_nicname TEXT NOT NULL
             );
         """)
 
@@ -44,8 +46,8 @@ def create_table(db_name):
                 name TEXT NOT NULL,
                 site_url TEXT NOT NULL,
                 login TEXT NOT NULL,
-                password TEXT NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(user_id)
+                password TEXT NOT NULL
+                
             );
         """)
 
@@ -61,4 +63,31 @@ def create_table(db_name):
 
 
 # create_table("users.db")
-# def add_db(name_db: str, name_table: str, colum: str, data: str) -> None:
+
+
+def check_user(db_name, Nic_name):
+    try:
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+
+        # Проверяем, существует ли пользователь и получаем user_id
+        cursor.execute("""
+            SELECT user_id FROM users WHERE user_nicname = ? LIMIT 1;
+        """, (Nic_name,))
+        result = cursor.fetchone()
+
+        if result:
+            return True, result[0]  # Возвращаем True и user_id
+        else:
+            return False, None  # Если пользователя нет
+    except sqlite3.Error as e:
+        print(f"Ошибка работы с базой данных: {e}")
+        return False, None
+    finally:
+        if conn:
+            conn.close()
+
+
+# print(check_user('../users.db', 'd1temnd'))
+
+
