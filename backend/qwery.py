@@ -3,29 +3,24 @@ import sqlite3
 
 def check_table_exists(db_name: str, table_name: str) -> bool:
     try:
-        # Подключаемся к базе данных
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
-        # Выполняем запрос для проверки существования таблицы
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", (table_name,))
 
-        # Получаем результат
         table_exists = cursor.fetchone() is not None
         print(table_exists)
 
-        # Закрываем соединение
         conn.close()
 
         return table_exists
     except sqlite3.Error as e:
-        print(f"Ошибка при проверке таблицы '{table_name}': {e}")
+        print(f"Ошибка '{table_name}': {e}")
         return False
 
 
 def create_table(db_name):
     try:
-        # Подключаемся к базе данных
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
@@ -51,9 +46,8 @@ def create_table(db_name):
             );
         """)
 
-        # Сохраняем изменения
         conn.commit()
-        print("Таблицы созданы успешно.")
+        print("успешно.")
 
     except sqlite3.Error as e:
         print(f"Ошибка при создании таблиц: {e}")
@@ -90,8 +84,7 @@ def check_user(db_name, Nic_name):
 
 
 def create_user(db_name, Nic_name, user_id):
-
-    if check_user(db_name, Nic_name)[0]:
+    if check_user(db_name, Nic_name)[0] or check_user(db_name, Nic_name)[1] == user_id:
         return False
     else:
         try:
@@ -101,7 +94,7 @@ def create_user(db_name, Nic_name, user_id):
             # Проверяем, существует ли пользователь и получаем user_id
             cursor.execute("""
                 INSERT INTO users (user_id, user_nicname) VALUES (?, ?);
-            """, (int(user_id), str(Nic_name), ))
+            """, (int(user_id), str(Nic_name),))
             conn.commit()
             return True
 
@@ -111,8 +104,4 @@ def create_user(db_name, Nic_name, user_id):
         finally:
             conn.close()
 
-
-# print(create_user('../users.db', '3', "123123123"))
-
-
-
+# print(create_user('../users.db', '3', 996027511))
