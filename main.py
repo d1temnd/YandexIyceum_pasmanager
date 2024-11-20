@@ -12,6 +12,7 @@ from ui.next import Ui_SubsequentWindow
 
 from backend.qwery import check_table_exists, create_table, check_user
 from backend.qwery import create_user, pars_pass, save_data
+from backend.qwery import remove_data
 from backend.bot import sand_code, gev_auth_cod
 
 testBool = False
@@ -77,6 +78,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.tableWidget.cellClicked.connect(self.copy)
         self.data_table()
         self.saveBtn.clicked.connect(self.get_data)
+        self.DelBtn.clicked.connect(self.del_data)
 
     def data_table(self):
         print(self.nic_user)
@@ -114,6 +116,27 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.passwordEdit.clear()
 
         self.data_table()
+
+    def del_data(self):
+        name_ser = self.nameEdit.text()
+        URL = self.siteUrlEdit.text()
+        login = self.loginEdit.text()
+        paswd = self.passwordEdit.text()
+
+        if not bool(re.match(pattern_url, URL)):
+            self.statusbar.showMessage(r'Не содержит URL. Должен начинатся с https://', 3000)
+            return
+
+        if not remove_data('users.db', tuple([self.nic_user, name_ser, URL, login, paswd])):
+            self.nameEdit.clear()
+            self.siteUrlEdit.clear()
+            self.loginEdit.clear()
+            self.passwordEdit.clear()
+
+            self.data_table()
+            self.statusbar.showMessage('Данные удалены', 3000)
+        else:
+            self.statusbar.showMessage('Данные не найдены', 3000)
 
     def copy(self, row, column):
         item = self.tableWidget.item(row, column)
