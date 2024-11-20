@@ -18,7 +18,8 @@ def sand_code(user_id: int, login_code: str):
         f"https://api.telegram.org/bot{os.getenv('TOKEN')}/sendMessage",
         params={
             "chat_id": user_id,
-            "text": login_code
+            "text": f"Ваш пароль для входа в приложение: ||{login_code} ||",
+            "parse_mode": "MarkdownV2"
         }
     )
 
