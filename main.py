@@ -1,17 +1,23 @@
 import sys
 import os
-from dotenv import load_dotenv
 
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6 import QtWidgets
+from dotenv import load_dotenv
+import re
+
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from ui.first import Ui_FirstTimeWindow
 from ui.interf import Ui_MainWindow
 from ui.next import Ui_SubsequentWindow
 
 from backend.qwery import check_table_exists, create_table, check_user
-from backend.qwery import create_user
+from backend.qwery import create_user, pars_pass, save_data
 from backend.bot import sand_code, gev_auth_cod
 
 testBool = False
+pattern_password = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$'
+pattern_url = r'^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$'
+
 load_dotenv('backend/.env')
 
 
@@ -45,24 +51,76 @@ class RegUser(QMainWindow, Ui_FirstTimeWindow):
             else:
                 self.statusbar.clearMessage()
                 # print('auth')
-                if not create_user('users.db', str(self.lineEdit.text()), int(self.tgIdEdit.text())):
+                if create_user('users.db', str(self.lineEdit.text()), int(self.tgIdEdit.text())):
                     # print('успешно в бд')
-                # else:
+                    # else:
                     # print('такой юзер уже есть')
+                    create_user('users.db', str(self.lineEdit.text()), int(self.tgIdEdit.text()))
                     self.close()
                     self.auth_user = LoginWin()
                     self.auth_user.show()
-                    self.auth_user.statusbar.showMessage("у вас уже есть аккаунт")
 
+                else:
+                    self.statusbar.showMessage('пользователь с таким ником уже есть')
 
         else:
             self.statusbar.showMessage('uncorrect auth cod')
 
 
 class MainWin(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, nic_user):
         super().__init__()
         self.setupUi(self)
+        # self.tableWidget.setEnabled(False)
+        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.nic_user = nic_user
+        self.tableWidget.cellClicked.connect(self.copy)
+        self.data_table()
+        self.saveBtn.clicked.connect(self.get_data)
+
+    def data_table(self):
+        print(self.nic_user)
+        print(check_user('users.db', self.nic_user)[1])
+
+        data = pars_pass('users.db', self.nic_user)
+        print(data)
+
+        self.tableWidget.setRowCount(len(data))
+
+        for row_idx, row_data in enumerate(data):
+            for col_idx, value in enumerate(row_data):
+                self.tableWidget.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+
+    def get_data(self):
+        name_ser = self.nameEdit.text()
+        URL = self.siteUrlEdit.text()
+        login = self.loginEdit.text()
+        paswd = self.passwordEdit.text()
+
+        if not bool(re.match(pattern_url, URL)):
+            self.statusbar.showMessage(r'Не содержит URL. Должен начинатся с https://', 3000)
+            return
+
+        if not bool(re.match(pattern_password, paswd)):
+            self.statusbar.showMessage(
+                'Пароль ненадежный: должен быть не менее 8 символов, содержать заглавные и строчные буквы, '
+                'цифры и специальные символы.', 3000
+            )
+
+        save_data('users.db', tuple([self.nic_user, name_ser, URL, login, paswd]))
+        self.nameEdit.clear()
+        self.siteUrlEdit.clear()
+        self.loginEdit.clear()
+        self.passwordEdit.clear()
+
+        self.data_table()
+
+    def copy(self, row, column):
+        item = self.tableWidget.item(row, column)
+        if item:
+            clipboard = QApplication.clipboard()
+            clipboard.setText(item.text())
+            self.statusbar.showMessage(f"Скопировано: {item.text()}", 2000)
 
 
 class LoginWin(QMainWindow, Ui_SubsequentWindow):
@@ -90,15 +148,14 @@ class LoginWin(QMainWindow, Ui_SubsequentWindow):
 
     def check_cod_auth(self):
         if self.last_cod == self.codeEdit.text():
-            print(1)  # TODO: заход в интерфе основной интерфейс
             self.close()
-            self.main_windows = MainWin()
+            nic_user = self.NicEdit.text()
+            self.main_windows = MainWin(nic_user)
             self.main_windows.show()
-            self.main_windows.statusbar.showMessage(self.NicEdit.text())
-
+            self.main_windows.statusbar.showMessage(nic_user)
         else:
             print(2)
-            self.statusbar.showMessage('не верный код авторизыции')
+            self.statusbar.showMessage('не верный код авторизации')
 
 
 def main():
@@ -106,6 +163,7 @@ def main():
     check_user = LoginWin()
     check_user.show()
     sys.exit(app.exec())
+    create_table('users.db')
 
 
 if __name__ == '__main__':
