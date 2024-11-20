@@ -35,7 +35,7 @@ def create_table(db_name):
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS passMGR (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nic_name INTEGER,
+                nic_name TEXT NOT NULL,
                 name TEXT NOT NULL,
                 site_url TEXT NOT NULL,
                 login TEXT NOT NULL,
@@ -146,7 +146,32 @@ def save_data(db_name: str, data: tuple) -> bool:
     finally:
         conn.close()
 
+
 # save_data('../users.db', ('nic', 'test', 'test2', 'test3', 'test4'))
+
+def remove_data(db_name: str, data: tuple) -> bool:
+    try:
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM passMGR 
+            WHERE nic_name=? AND name=? AND site_url=? AND login=? AND password=?;
+        """, data)
+
+        conn.commit()
+        return True
+
+    except sqlite3.Error as e:
+        print(f"Ошибка работы с базой данных: {e}")
+        return False
+
+    finally:
+        conn.close()
+
+
+# Пример вызова функции
+# print(remove_data('../users.db', ('nic', 'test', 'test2', 'test3', 'test4')))
 
 
 # create_table('../users.db')
