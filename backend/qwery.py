@@ -133,7 +133,7 @@ def save_data(db_name: str, data: tuple) -> bool:
 
         cursor.execute("""
             INSERT INTO passMGR (nic_name, name, site_url, login, password) VALUES (?, ?, ?, ?, ?);
-        """, (*data, ))
+        """, (*data,))
 
         conn.commit()
         print("Данные успешно добавлены.")
@@ -170,8 +170,29 @@ def remove_data(db_name: str, data: tuple) -> bool:
         conn.close()
 
 
-# Пример вызова функции
 # print(remove_data('../users.db', ('nic', 'test', 'test2', 'test3', 'test4')))
+
+def check_name_servis(db_name: str, servis_name: str, user_nic_name: str) -> bool:
+    try:
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT name FROM passMGR WHERE name = ? AND nic_name = ? LIMIT 1;
+        """, (servis_name, user_nic_name))
+        result = cursor.fetchone()
+
+        if result:
+            return True
+        else:
+            return False
+    except sqlite3.Error as e:
+        print(f"Ошибка работы с базой данных: {e}")
+        return False
+    finally:
+        conn.close()
+
+# print(check_name_servis('../users.db', '1235', 'd1t'))
 
 
 # create_table('../users.db')

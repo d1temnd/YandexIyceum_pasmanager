@@ -12,7 +12,7 @@ from ui.next import Ui_SubsequentWindow
 
 from backend.qwery import check_table_exists, create_table, check_user
 from backend.qwery import create_user, pars_pass, save_data
-from backend.qwery import remove_data
+from backend.qwery import remove_data, check_name_servis
 from backend.bot import sand_code, gev_auth_cod
 
 testBool = False
@@ -98,6 +98,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
         URL = self.siteUrlEdit.text()
         login = self.loginEdit.text()
         paswd = self.passwordEdit.text()
+
+        if check_name_servis('users.db', name_ser, self.nic_user):
+            self.statusbar.showMessage('Такое название сервиса уже есть', 3000)
+            return
 
         if not bool(re.match(pattern_url, URL)):
             self.statusbar.showMessage(r'Не содержит URL. Должен начинатся с https://', 3000)
